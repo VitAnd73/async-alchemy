@@ -5,7 +5,6 @@ from sqlalchemy import Column, and_, update
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
-from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -15,11 +14,11 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm import selectinload
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.util import greenlet_spawn
-from dal.a import A
-from dal.b import B
-from dal.tag import Tag
-from dal.user import User
-from dal.user_tag import user_tag
+from models.a import A
+from models.b import B
+from models.tag import Tag
+from models.user import User
+from models.user_tag import user_tag
 
 from datetime import datetime
 from configs import db_conn_str
@@ -67,36 +66,46 @@ async def async_main():
         #     await session.execute(user_tag.insert().values(user_id=i, tag_id=i))
         # await session.commit()
 
-        stmt1 = select(User).where(User.id == 1)
-        result1 = await session.execute(stmt1)
-        user1 = result1.scalars().one()
-        print(f"user1 id =[{user1.id}]\n=================\n")
+        # stmt1 = select(User).where(User.id == 1)
+        # result1 = await session.execute(stmt1)
+        # user1 = result1.scalars().one()
+        # print(f"user1 id =[{user1.id}]\n=================\n")
 
-            # where(and_(user_tag.c.user_id == 26, user_tag.c.tag_id == 25)).
-        stmt2 = (
-            update(user_tag).
-            where(user_tag.c.user_id == 23 and user_tag.c.tag_id == 23).
-            values(tag_id = 1)
-        )
+        # stmt2 = (
+        #     update(user_tag).
+        #     where(and_(user_tag.c.user_id == 17, user_tag.c.tag_id == 24)).
+        #     values(user_id = 9)
+        # )
         # stmt2 = (
         #     update(User).
         #     where(User.id == 26).
         #     values(name = "asdasd")
         # )
-        await session.execute(stmt2)
-        await session.commit()
         
+        # from sqlalchemy import delete
+
+        # stmt3 = (
+        #     delete(Tag).
+        #     where(Tag.id == 1)
+        # )
+        # stmt3 = (
+        #     delete(user_tag).
+        #     where(user_tag.c.tag_id == 1)
+        # )
+        
+        # await session.execute(stmt2)
+        # await session.commit()
         
         # await session.refresh(user1)
 
-        # stmt = select(User).options(selectinload(User.tags))
-        # result = await session.execute(stmt)
-        # for cur_user in result.scalars():
-        #     print(f"cur_user: {cur_user.id}")
-        #     if cur_user.tags:
-        #         tags = map(lambda u: str(u.id), cur_user.tags)
-        #         tags_str = ';\n'.join(tags)
-        #         print(f"with tags =[{tags_str}]\n=================\n")
+        stmt = select(User).options(selectinload(User.tags))
+        result = await session.execute(stmt)
+        for cur_user in result.scalars():
+            if cur_user.tags:
+                print(f"cur_user: {cur_user.id} with tags:\n")
+                tags = map(lambda u: str(u.id), cur_user.tags)
+                tags_str = ';\n'.join(tags)
+                print(f"with tags =[{tags_str}]\n=================\n")
     
     # tags = users[0].tags
     # # tags = await greenlet_spawn(users[0].tags)
